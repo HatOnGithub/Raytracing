@@ -1,0 +1,72 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\Vango011\\Downloads\\INFOGR\\INFOGR2023Template\\INFOGR2023Template.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\Vango011\\Downloads\\INFOGR\\INFOGR2023Template\\INFOGR2023Template.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Vango011\\Downloads\\INFOGR\\INFOGR2023Template\\INFOGR2023Template.csproj",
+        "projectName": "INFOGR2023Template",
+        "projectPath": "C:\\Users\\Vango011\\Downloads\\INFOGR\\INFOGR2023Template\\INFOGR2023Template.csproj",
+        "packagesPath": "C:\\Users\\Vango011\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Vango011\\Downloads\\INFOGR\\INFOGR2023Template\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Vango011\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "OpenTK": {
+              "target": "Package",
+              "version": "[4.7.1, )"
+            },
+            "SixLabors.ImageSharp": {
+              "target": "Package",
+              "version": "[2.1.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
