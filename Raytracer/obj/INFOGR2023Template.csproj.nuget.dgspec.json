@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Vango011\\Downloads\\INFOGR\\INFOGR2023Template\\INFOGR2023Template.csproj": {}
+    "C:\\Users\\LeHat\\source\\repos\\Raytracing\\Raytracer\\INFOGR2023Template.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Vango011\\Downloads\\INFOGR\\INFOGR2023Template\\INFOGR2023Template.csproj": {
+    "C:\\Users\\LeHat\\source\\repos\\Raytracing\\Raytracer\\INFOGR2023Template.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Vango011\\Downloads\\INFOGR\\INFOGR2023Template\\INFOGR2023Template.csproj",
+        "projectUniqueName": "C:\\Users\\LeHat\\source\\repos\\Raytracing\\Raytracer\\INFOGR2023Template.csproj",
         "projectName": "INFOGR2023Template",
-        "projectPath": "C:\\Users\\Vango011\\Downloads\\INFOGR\\INFOGR2023Template\\INFOGR2023Template.csproj",
-        "packagesPath": "C:\\Users\\Vango011\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Vango011\\Downloads\\INFOGR\\INFOGR2023Template\\obj\\",
+        "projectPath": "C:\\Users\\LeHat\\source\\repos\\Raytracing\\Raytracer\\INFOGR2023Template.csproj",
+        "packagesPath": "C:\\Users\\LeHat\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\LeHat\\source\\repos\\Raytracing\\Raytracer\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Vango011\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\LeHat\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,6 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -55,7 +60,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -64,7 +70,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     }

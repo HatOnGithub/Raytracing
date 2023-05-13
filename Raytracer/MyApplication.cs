@@ -1,13 +1,18 @@
-namespace Template
+namespace Raytracing
 {
-    class MyApplication
+    using OpenTK.Mathematics;
+    using System.Drawing;
+
+    class Application
     {
         // member variables
         public Surface screen;
+        public Surface debug;
         // constructor
-        public MyApplication(Surface screen)
+        public Application(Surface screen, Surface debug)
         {
             this.screen = screen;
+            this.debug = debug;
         }
         // initialize
         public void Init()
@@ -17,9 +22,12 @@ namespace Template
         // tick: renders one frame
         public void Tick()
         {
-            screen.Clear(0);
-            screen.Print("hello world", 2, 2, 0xffffff);
-            screen.Line(2, 20, 160, 20, 0xff0000);
+            screen.Clear(RGBtoINT(255,100,0));
+            debug.Clear(RGBtoINT(0,50,255));
         }
+
+        public int RGBtoINT(int r, int g, int b) { return (b << 16) + (g << 8) + r; }
+
+        public int RGBtoINT(Color color) { return (color.B << 16) + (color.G << 8) + color.R; }
     }
 }
