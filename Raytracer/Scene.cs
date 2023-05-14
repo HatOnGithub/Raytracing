@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK.Mathematics;
 
 namespace Raytracing
 {
@@ -10,6 +11,7 @@ namespace Raytracing
     {
         List<Primitive> Objects;
         List<Light> Lightsources;
+        public static Vector3 AmbientLight = new(0.01f, 0.01f, 0.01f);
 
         public Scene()
         {

@@ -10,14 +10,14 @@ namespace Raytracing
     public class Ray
     {
         public Vector3 Origin, Direction;
-        public int bounces;
-        public float IntersectDistance;
+        public float intersectDistance = float.NegativeInfinity;
+        public string raytype;
 
-        public Ray(Vector3 origin, Vector3 direction, int bounces)
+        public Ray(Vector3 origin, Vector3 direction, string raytype = "p")
         {
             Origin = origin;
-            Direction = direction;
-            this.bounces = bounces;
+            Direction = Vector3.Normalize(direction);
+            this.raytype = raytype;
         }
     }
 }

@@ -26,7 +26,11 @@ namespace Raytracing
         public Vector3 PlaneY => p2 - p0;
 
 
-        public void SetFOV(float degrees) { float radians = (float)(Math.Clamp(degrees, 60, 120) * Math.PI/180); distanceToPlane = (float)(screen.width/2 / Math.Tan(radians)); }
+        public void SetFOV(float degrees) 
+        { 
+            float radians = (float)(Math.Clamp(degrees, 60, 120) * (Math.PI/180)); 
+            distanceToPlane = screen.width/2 / MathF.Tan(radians / 2); 
+        }
         public void ChangeFOV(float degrees) { float newAngle = (float)(Math.Clamp(CurrentFOV + degrees, 60, 120) * Math.PI / 180); SetFOV(newAngle); }
         public Vector3 Normalise(Vector3 unNormalised) { Vector3 hat = unNormalised; hat.Normalize(); return hat; }
 
@@ -34,12 +38,15 @@ namespace Raytracing
         {
             this.screen = screen;
             this.Position = Position;
-            this.Direction = Direction;
-            this.Up = Up;
+            this.Direction = Vector3.Normalize(Direction);
+            this.Up = Vector3.Normalize(Up);
             SetFOV(degrees);
         }
 
-        public Ray GetRayForPixelAt(int x, int y) { return new Ray(Position, Normalise((x * PlaneX + y * PlaneY) - Position)); }
+        public Ray GetRayForPixelAt(int x, int y) 
+        { 
+            return new Ray(Position, Normalise(p0 + (((float)x / (float)screen.width) * PlaneX) + (((float)y / (float)screen.height) * PlaneY) - Position)); 
+        }
 
 
     }
