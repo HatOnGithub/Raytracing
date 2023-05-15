@@ -12,7 +12,7 @@ namespace Raytracing
         int debugID;
         Application? app;      // instance of the application
         bool terminated = false; // application terminates gracefully when this is true
-
+        KeyboardState keyboardState;
         // The following variables are only needed in Modern OpenGL
         public int VAOmain;
         public int VBOmain;
@@ -85,14 +85,15 @@ namespace Raytracing
         {
             base.OnUpdateFrame(e);
             // called once per frame; app logic
-            var keyboard = KeyboardState;
-            if (keyboard[Keys.Escape]) terminated = true;
+            keyboardState = KeyboardState;
+            if (keyboardState[Keys.Escape]) terminated = true;
+            
         }
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
             // called once per frame; render
-            app?.Tick();
+            app?.Tick( e, keyboardState);
 
             if (terminated)
             {
@@ -201,7 +202,7 @@ namespace Raytracing
         {
             // entry point
             using OpenTKApp app = new();
-            app.RenderFrequency = 144.0;
+            app.RenderFrequency = 0;
             app.Run();
         }
     }

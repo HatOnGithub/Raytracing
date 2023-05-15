@@ -60,6 +60,7 @@ namespace Raytracing
             float b = Vector3.Dot(ray.Direction, ray.Origin - Position);
             float c = (ray.Origin - Position).LengthSquared - (radius * radius);
             float discriminant = (b * b) - (a * c);
+
             intersectDistance = MathF.Min(MathF.Max(0, (-b + MathF.Sqrt(discriminant)) / a), MathF.Max(0, (-b - MathF.Sqrt(discriminant)) / a));
 
             if (discriminant >= 0 && intersectDistance > 0)
@@ -90,21 +91,63 @@ namespace Raytracing
         public override IntersectData Intersect(Ray ray)
         {
             Vector3 p0 = Position;
-            Vector3 r0 = ray.Origin;
-            Vector3 r = ray.Direction;
+            Vector3 l0 = ray.Origin;
+            Vector3 l = ray.Direction;
             Vector3 n = NormalVector;
 
-            float numerator = Vector3.Dot(p0 - r0, n);
-            float denominator = Vector3.Dot(r, n);
+            float numerator = Vector3.Dot(p0 - l0, n);
+            float denominator = Vector3.Dot(l, n);
+            float division = numerator / denominator; 
             float intersectDistance;
 
-            if (numerator / denominator < 0 || denominator == 0 || Vector3.Dot(r, n) > 0) intersectDistance = float.NegativeInfinity;
-            else intersectDistance = numerator / denominator;
+            if (division < 0 || denominator == 0 || numerator == 0 || Vector3.Dot(l, n) > 0) intersectDistance = float.NegativeInfinity;
+            else intersectDistance = division;
 
             if (intersectDistance > 0) return new(Color, intersectDistance, this);
             return new(ambientColor, intersectDistance, null);
         }
 
         public override Vector3 Normal(Vector3 position) { return NormalVector; } // position irrelevant
+    }
+
+    public class Triangle : Primitive
+    {
+        public Vector3[] vertices = new Vector3[3];
+
+        public Triangle(Vector3[] vertices, Vector3 Color, MaterialType materialType, float reflectiveness = 0.5f):
+            base(vertices[0], Color, materialType, reflectiveness)
+        {
+            this.vertices = vertices;
+        }
+
+        public override IntersectData Intersect(Ray ray)
+        {
+            Vector3 A = vertices[0];
+            Vector3 B = vertices[1];
+            Vector3 C = vertices[2];
+
+            if (Vector3.Dot(ray.Direction, Vector3.Cross(B - A, C - A)) > 0)
+            {
+                B = vertices[2];
+                C = vertices[1];
+            }
+
+            Vector3 normal = Vector3.Cross(B - A, C - A);
+
+            float intersectDistance = (Vector3.Dot(vertices[0] - ray.Origin, normal) / Vector3.Dot(ray.Direction, normal));
+            Vector3 planeIntersection = ray.Origin + intersectDistance * ray.Direction;
+
+            if (Vector3.Dot(Vector3.Cross(B - A, planeIntersection - A), normal) >= 0 &&
+                Vector3.Dot(Vector3.Cross(A - C, planeIntersection - C), normal) >= 0 &&
+                Vector3.Dot(Vector3.Cross(C - B, planeIntersection - B), normal) >= 0) 
+                return new(Color, intersectDistance, this);
+
+            return new(ambientColor, float.NegativeInfinity, null);
+        }
+
+        public override Vector3 Normal(Vector3 position)
+        {
+            return Vector3.Cross(vertices[1] - vertices[0], vertices[2] - vertices[0]);
+        }
     }
 }

@@ -7,7 +7,7 @@ using OpenTK.Mathematics;
 
 namespace Raytracing
 {
-    public class IntersectData
+    public struct IntersectData
     {
         public int iColor { get { return Application.RGBtoINT(Color); } }
         public Vector3 Color;
