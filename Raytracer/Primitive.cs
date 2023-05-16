@@ -11,15 +11,19 @@ namespace Raytracing
     {
         Diffuse,
         Gloss,
-        Mirror
+        DiffuseMirror,
+        Mirror,
+        Glass
     }
+
 
 
     public abstract class Primitive
     {
         
         public Vector3 Position;
-        public Vector3 Color;
+        public Vector3 DiffuseColor;
+        public Vector3 SpecularColor = Vector3.One;
         public MaterialType materialType;
         public float reflectiveness = 0.5f;
         public float specularity = 10;
@@ -28,7 +32,7 @@ namespace Raytracing
         public Primitive(Vector3 position, Vector3 color, MaterialType materialType, float reflectiveness = 0.5f)
         {
             Position = position;
-            Color = color;
+            DiffuseColor = color;
             this.materialType = materialType;
             this.reflectiveness = reflectiveness;
         }
@@ -65,7 +69,7 @@ namespace Raytracing
 
             if (discriminant >= 0 && intersectDistance > 0)
             {
-                returnColor = Color;
+                returnColor = DiffuseColor;
                 nullablePrimitive = this;
             }
 
@@ -103,7 +107,7 @@ namespace Raytracing
             if (division < 0 || denominator == 0 || numerator == 0 || Vector3.Dot(l, n) > 0) intersectDistance = float.NegativeInfinity;
             else intersectDistance = division;
 
-            if (intersectDistance > 0) return new(Color, intersectDistance, this);
+            if (intersectDistance > 0) return new(DiffuseColor, intersectDistance, this);
             return new(ambientColor, intersectDistance, null);
         }
 
@@ -140,7 +144,7 @@ namespace Raytracing
             if (Vector3.Dot(Vector3.Cross(B - A, planeIntersection - A), normal) >= 0 &&
                 Vector3.Dot(Vector3.Cross(A - C, planeIntersection - C), normal) >= 0 &&
                 Vector3.Dot(Vector3.Cross(C - B, planeIntersection - B), normal) >= 0) 
-                return new(Color, intersectDistance, this);
+                return new(DiffuseColor, intersectDistance, this);
 
             return new(ambientColor, float.NegativeInfinity, null);
         }
