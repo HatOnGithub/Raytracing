@@ -72,7 +72,7 @@ namespace Raytracing
             if (keyboard[Keys.T]) fovChange += 1;
             if (keyboard[Keys.G]) fovChange -= 1;
 
-            raytracer.MoveCamera(
+            raytracer.camera.MoveCamera(
                 movement * movementspeed * (float)e.Time, 
                 pitch * pitchSpeed * (float)e.Time, 
                 yaw * yawSpeed * (float)e.Time, 

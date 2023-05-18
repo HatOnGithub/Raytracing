@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "ZSlShTJc6Nv4LqRuq7FR9VQiqjywMX5YK3+ICDY4xue9V7gd5D/BngkVJTg47HAhTNoZ0s80hMtYQByYoIvIjw==",
+  "dgSpecHash": "GAEgBcdcvWXYEJH9H+dzK/k1ApvjcPv6Se3RLDBbEmuvx+0GStGkuIXO/EYa6ZRbfVHMCqN6NzyYTKgEK1eZEA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\LeHat\\Source\\Repos\\HatOnGithub\\Raytracing\\Raytracer\\Raytracing.csproj",
+  "projectFilePath": "C:\\Users\\LeHat\\source\\repos\\Raytracing\\Raytracer\\Raytracing.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\LeHat\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.0\\microsoft.netcore.platforms.5.0.0.nupkg.sha512",
+    "C:\\Users\\LeHat\\.nuget\\packages\\microsoft.win32.systemevents\\7.0.0\\microsoft.win32.systemevents.7.0.0.nupkg.sha512",
     "C:\\Users\\LeHat\\.nuget\\packages\\opentk\\4.7.1\\opentk.4.7.1.nupkg.sha512",
     "C:\\Users\\LeHat\\.nuget\\packages\\opentk.compute\\4.7.1\\opentk.compute.4.7.1.nupkg.sha512",
     "C:\\Users\\LeHat\\.nuget\\packages\\opentk.core\\4.7.1\\opentk.core.4.7.1.nupkg.sha512",
@@ -17,6 +18,7 @@
     "C:\\Users\\LeHat\\.nuget\\packages\\opentk.windowing.desktop\\4.7.1\\opentk.windowing.desktop.4.7.1.nupkg.sha512",
     "C:\\Users\\LeHat\\.nuget\\packages\\opentk.windowing.graphicslibraryframework\\4.7.1\\opentk.windowing.graphicslibraryframework.4.7.1.nupkg.sha512",
     "C:\\Users\\LeHat\\.nuget\\packages\\sixlabors.imagesharp\\2.1.1\\sixlabors.imagesharp.2.1.1.nupkg.sha512",
+    "C:\\Users\\LeHat\\.nuget\\packages\\system.drawing.common\\7.0.0\\system.drawing.common.7.0.0.nupkg.sha512",
     "C:\\Users\\LeHat\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\5.0.0\\system.runtime.compilerservices.unsafe.5.0.0.nupkg.sha512",
     "C:\\Users\\LeHat\\.nuget\\packages\\system.text.encoding.codepages\\5.0.0\\system.text.encoding.codepages.5.0.0.nupkg.sha512"
   ],

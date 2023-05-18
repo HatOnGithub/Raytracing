@@ -16,7 +16,7 @@ namespace Raytracing
         public Ray(Vector3 origin, Vector3 direction, string raytype = "p")
         {
             Origin = origin;
-            Direction = Vector3.Normalize(direction);
+            Direction = Vector3.NormalizeFast(direction);
             this.raytype = raytype;
         }
     }
