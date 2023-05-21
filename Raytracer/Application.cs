@@ -1,18 +1,16 @@
 namespace Raytracing
 {
     using OpenTK.Mathematics;
-    using System.Drawing;
-    using OpenTK;
-    using OpenTK.Windowing.GraphicsLibraryFramework;
     using OpenTK.Windowing.Common;
+    using OpenTK.Windowing.GraphicsLibraryFramework;
+    using System.Drawing;
 
     class Application
     {
         // member variables
         public Surface screen;
         public Surface debug;
-        public Raytracer raytracer;
-        public KeyboardState keyboardState;
+        public Raytracer? raytracer = null;
 
         // units per second
         public float movementspeed = 1;
@@ -23,12 +21,13 @@ namespace Raytracing
         public float rollSpeed = 5;
         public float fovChangeSpeed = 5;
 
+        public bool showedTextureloading = false;
+
         // constructor
         public Application(Surface screen, Surface debug)
         {
             this.screen = screen;
             this.debug = debug;
-            raytracer = new(screen, debug);
         }
         // initialize
         public void Init()
@@ -38,9 +37,18 @@ namespace Raytracing
         // tick: renders one frame
         public void Tick(FrameEventArgs e, KeyboardState keyboard)
         {
-            keyboardState = keyboard;
-
             HandleInput(e, keyboard);
+
+            if (raytracer == null)
+            {
+                if (!showedTextureloading)
+                {
+                    showedTextureloading = true;
+                    screen.Print("Loading Textures, give it a moment :)", 20, 20, 0xffffff);
+                    return;
+                }
+                raytracer = new(screen, debug);
+            }
 
             raytracer.Render();
         }
@@ -51,7 +59,7 @@ namespace Raytracing
             float pitch = 0;
             float yaw = 0;
             float roll = 0;
-            float fovChange = 1;
+            float fovChange = 0;
 
             if (keyboard[Keys.W]) movement.X += 1;
             if (keyboard[Keys.A]) movement.Z -= 1;
@@ -72,11 +80,11 @@ namespace Raytracing
             if (keyboard[Keys.T]) fovChange += 1;
             if (keyboard[Keys.G]) fovChange -= 1;
 
-            raytracer.camera.MoveCamera(
-                movement * movementspeed * (float)e.Time, 
-                pitch * pitchSpeed * (float)e.Time, 
-                yaw * yawSpeed * (float)e.Time, 
-                roll * rollSpeed * (float)e.Time, 
+            raytracer?.camera.MoveCamera(
+                movement * movementspeed * (float)e.Time,
+                pitch * pitchSpeed * (float)e.Time,
+                yaw * yawSpeed * (float)e.Time,
+                roll * rollSpeed * (float)e.Time,
                 fovChange * fovChangeSpeed * (float)e.Time);
         }
 

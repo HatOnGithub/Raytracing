@@ -12,7 +12,6 @@ namespace Raytracing
         int debugID;
         Application? app;      // instance of the application
         bool terminated = false; // application terminates gracefully when this is true
-        KeyboardState keyboardState;
         // The following variables are only needed in Modern OpenGL
         public int VAOmain;
         public int VBOmain;
@@ -57,8 +56,8 @@ namespace Raytracing
             // called during application initialization
             GL.ClearColor(0, 0, 0, 0);
             GL.Disable(EnableCap.DepthTest);
-            Surface screen = new(ClientSize.X/2, ClientSize.Y);
-            Surface debug = new(ClientSize.X/2, ClientSize.Y);
+            Surface screen = new(ClientSize.X / 2, ClientSize.Y);
+            Surface debug = new(ClientSize.X / 2, ClientSize.Y);
             app = new Application(screen, debug);
             screenID = app.screen.GenTexture();
             debugID = app.debug.GenTexture();
@@ -66,7 +65,7 @@ namespace Raytracing
             SetupVAO(ref VAOmain, ref VBOmain, verticesMain);
             SetupVAO(ref VAOdebug, ref VAOdebug, verticesdebug);
 
-            
+
             app.Init();
         }
         protected override void OnUnload()
@@ -85,15 +84,14 @@ namespace Raytracing
         {
             base.OnUpdateFrame(e);
             // called once per frame; app logic
-            keyboardState = KeyboardState;
-            if (keyboardState[Keys.Escape]) terminated = true;
-            
+            if (KeyboardState[Keys.Escape]) terminated = true;
+
         }
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
             // called once per frame; render
-            app?.Tick( e, keyboardState);
+            app?.Tick(e, KeyboardState);
 
             if (terminated)
             {
@@ -133,7 +131,7 @@ namespace Raytracing
             SwapBuffers();
         }
 
-        public void SetupVAO( ref int VAO, ref int VBO, float[] vertices)
+        public void SetupVAO(ref int VAO, ref int VBO, float[] vertices)
         {
             // setting up a Modern OpenGL pipeline takes a lot of code
             // Vertex Array Object: will store the meaning of the data in the buffer
@@ -202,7 +200,7 @@ namespace Raytracing
         {
             // entry point
             using OpenTKApp app = new();
-            app.RenderFrequency = 0;
+            app.RenderFrequency = 144;
             app.Run();
         }
     }

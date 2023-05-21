@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using OpenTK.Mathematics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenTK.Mathematics;
 
 namespace Raytracing
 {
@@ -22,7 +17,7 @@ namespace Raytracing
         {
             this.position = Position;
             this.Color = Color;
-            originalColor= this.Color;
+            originalColor = this.Color;
             this.Intensity = Intensity;
         }
     }
@@ -48,7 +43,7 @@ namespace Raytracing
             return position + (normal * -1) * intersectDistance;
         }
 
-        public PlaneLight(Vector3 Position, Vector3 Normal, Vector3 Color, float intensity):
+        public PlaneLight(Vector3 Position, Vector3 Normal, Vector3 Color, float intensity) :
             base(Position, Color, intensity)
         {
             normal = Normal;

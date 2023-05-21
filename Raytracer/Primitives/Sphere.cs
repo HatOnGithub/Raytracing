@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 
 namespace Raytracing
 {
@@ -20,8 +15,8 @@ namespace Raytracing
             Direction = new(1, 0, 0);
         }
 
-        public Sphere(Vector3 position, string path, MaterialType materialType, float radius, float reflectiveness = 0.5f, float refractiveIndex = 1.6f) :
-            base(position, path, materialType, reflectiveness)
+        public Sphere(Vector3 position, string imagePath, MaterialType materialType, float radius, float reflectiveness = 0.5f, float refractiveIndex = 1.6f) :
+            base(position, imagePath, materialType, reflectiveness)
         {
             this.radius = radius;
             this.refractiveIndex = refractiveIndex;
@@ -29,6 +24,7 @@ namespace Raytracing
             Direction = new(1, 0, 0);
         }
 
+        // algorithm derived from slides and Wikipedia
         public override IntersectData Intersect(Ray ray)
         {
             // quadratic formula
@@ -39,11 +35,18 @@ namespace Raytracing
 
 
             float a = ray.Direction.LengthSquared;
-            float b = Vector3.Dot(ray.Direction, ray.Origin - Position);
-            float c = (ray.Origin - Position).LengthSquared - radius * radius;
-            float discriminant = b * b - a * c;
+            float b = 2 * Vector3.Dot(ray.Direction, ray.Origin - Position);
+            float c = (ray.Origin - Position).LengthSquared - (radius * radius);
+            float discriminant = (b * b) - (4 * a * c);
+            float plus = (-b + MathF.Sqrt(discriminant)) / (2 * a);
+            float minus = (-b - MathF.Sqrt(discriminant)) / (2 * a);
 
-            intersectDistance = MathF.Min(MathF.Max(0, (-b + MathF.Sqrt(discriminant)) / a), MathF.Max(0, (-b - MathF.Sqrt(discriminant)) / a));
+
+            if (discriminant < 0) return new(returnColor, intersectDistance, nullablePrimitive);
+
+
+            if (minus < plus && minus > 0) intersectDistance = minus;
+            else intersectDistance = plus;
 
             if (discriminant >= 0 && intersectDistance > 0)
             {
@@ -61,13 +64,12 @@ namespace Raytracing
 
         public override Vector3 GetColorFromTextureAtIntersect(Vector3 IntersectPoint)
         {
+            // Uses mercator projection to project the texture onto the sphere
             int x, y;
 
             Vector3 normal = Normal(IntersectPoint);
-            float xnormal = (normal.X + 1) / 2;
-            if (normal.Z < 0) xnormal = 4 - xnormal;
-            x = (int)((Texture.GetLength(0) - 1) * (xnormal / 4));
-            y = (int)((Texture.GetLength(1) - 1) * -((normal.Y - 1) / 2));
+            x = (int)Math.Round((Texture.GetLength(0) - 1) * (MathF.Atan2(normal.X, normal.Z) / (2 * MathF.PI) + 0.5f));
+            y = (int)Math.Round((Texture.GetLength(1) - 1) * -((normal.Y - 1) / 2));
 
             return Texture[x, y];
         }

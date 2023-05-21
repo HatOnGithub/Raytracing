@@ -1,6 +1,7 @@
-﻿using SixLabors.ImageSharp;
+﻿using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using OpenTK.Graphics.OpenGL;
 
 namespace Raytracing
 {
@@ -191,6 +192,17 @@ namespace Raytracing
                     {
                         if ((font.pixels[src + u] & 0xffffff) != 0) pixels[dest + u] = c;
                     }
+            }
+        }
+
+        public void DrawSphere(Vector2 Center, float radius, int color)
+        {
+            int numberOfPixels = (int)Math.Ceiling((radius * 2) * (2 * MathF.PI)); // circumference in radians ( x2 to mitigate gaps in the circle)
+            float angleUnit = numberOfPixels / (2 * MathF.PI);
+            for (int i = 0; i < numberOfPixels; i++)
+            {
+                Vector2i pixelPos = new((int)Math.Round(Center.X + (radius * MathF.Sin((i * angleUnit)))), (int)Math.Round(Center.Y + (radius * MathF.Cos((i * angleUnit)))));
+                Plot(pixelPos.X, pixelPos.Y, color);
             }
         }
     }

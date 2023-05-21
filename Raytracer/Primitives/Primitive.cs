@@ -1,10 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Raytracing
 {
@@ -24,6 +18,7 @@ namespace Raytracing
         public Vector3[,] Texture;
         public Vector3 SpecularColor = Vector3.One;
         public Vector3 Up, Direction;
+        public Vector3 averageColor;
         public MaterialType materialType;
         public float reflectiveness = 0.5f;
         public float specularity = 10;
@@ -34,6 +29,7 @@ namespace Raytracing
         {
             Position = position;
             Texture = new Vector3[1, 1] { { Color } };
+            averageColor = Color;
             this.materialType = materialType;
             this.reflectiveness = reflectiveness;
         }
@@ -42,12 +38,31 @@ namespace Raytracing
         {
             Position = position;
             Texture = ImageLoader.LoadFromFile(path);
+            averageColor = GetAverageColor(Texture);
             this.materialType = materialType;
             this.reflectiveness = reflectiveness;
         }
 
+        /// <summary>
+        /// returns intersectdata using the ray
+        /// </summary>
+        /// <param name="ray"></param>
+        /// <returns></returns>
         public abstract IntersectData Intersect(Ray ray);
 
+        public Vector3 GetAverageColor(Vector3[,] Texture)
+        {
+            Vector3 result = new();
+            foreach (Vector3 value in Texture) result += value;
+            return result / Texture.Length;
+        }
+
+
+        /// <summary>
+        /// returns the normal at the given position
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public abstract Vector3 Normal(Vector3 position);
 
         /// <summary>
@@ -58,9 +73,4 @@ namespace Raytracing
         public abstract Vector3 GetColorFromTextureAtIntersect(Vector3 intersectPoint);
 
     }
-
-    
-
-   
-    
 }

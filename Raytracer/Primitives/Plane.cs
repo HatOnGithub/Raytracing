@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 
 namespace Raytracing
 {
@@ -26,8 +21,8 @@ namespace Raytracing
             if (float.IsNaN(Up.X) || Up == Vector3.Zero)
                 Up = Vector3.Normalize(Vector3.Cross(-NormalVector, Direction));
         }
-        public Plane(Vector3 Position, Vector3 Normal, string path, Vector2 TextureDimensions, MaterialType materialType, float reflectiveness = 0.5f) :
-            base(Position, path, materialType, reflectiveness)
+        public Plane(Vector3 Position, Vector3 Normal, string imagePath, Vector2 TextureDimensions, MaterialType materialType, float reflectiveness = 0.5f) :
+            base(Position, imagePath, materialType, reflectiveness)
         {
             NormalVector = Vector3.Normalize(Normal);
             this.TextureDimensions = TextureDimensions;
@@ -43,6 +38,8 @@ namespace Raytracing
 
         public override IntersectData Intersect(Ray ray)
         {
+            // formulae from Wikipedia (line-Plane intersections)
+
             Vector3 p0 = Position;
             Vector3 l0 = ray.Origin;
             Vector3 l = ray.Direction;
@@ -68,14 +65,17 @@ namespace Raytracing
         {
             double x, y;
 
+            // tiles the plane regularly according to the given size a texture should be on the plane in meters
             x = (Vector3.Dot(IntersectPoint - Position, Direction) % TextureDimensions.X) / TextureDimensions.X;
             y = (Vector3.Dot(IntersectPoint - Position, Up) % TextureDimensions.Y) / TextureDimensions.Y;
 
             if (x < 0) x += 1;
             if (y < 0) y += 1;
 
+            // inverts the y direction, can be removed but i thought it looked better this way
             y = 1 - y;
 
+            // precentage to xoordinate
             x *= Texture.GetLength(0) - 1;
             y *= Texture.GetLength(1) - 1;
 

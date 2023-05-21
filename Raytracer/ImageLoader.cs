@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenTK.Mathematics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using OpenTK.Mathematics;
 
 namespace Raytracing
 {
@@ -19,7 +14,7 @@ namespace Raytracing
                 for (int y = 0; y < image.Height; y++)
                 {
                     Rgb24 pixel = image[x, y];
-                    result[x,y] = new Vector3(pixel.ToScaledVector4().X, pixel.ToScaledVector4().Y, pixel.ToScaledVector4().Z);
+                    result[x, y] = new Vector3(pixel.ToScaledVector4().X, pixel.ToScaledVector4().Y, pixel.ToScaledVector4().Z);
                 }
             return result;
         }

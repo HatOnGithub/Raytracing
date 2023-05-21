@@ -1,10 +1,4 @@
-﻿using OpenTK.Graphics.OpenGL;
-using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenTK.Mathematics;
 
 namespace Raytracing
 {
@@ -14,9 +8,8 @@ namespace Raytracing
 
         public float distanceToPlane;
         float aspectRatio;
-        public float CurrentFOV { get { return (float)Math.Atan2(screen.width / 2, distanceToPlane); } }
+        public float CurrentFOV;
 
-        public float exposure;
         public Vector3 Position { get; set; }
         public Vector3 Up { get; set; }
         public Vector3 Direction { get; set; }
@@ -27,17 +20,19 @@ namespace Raytracing
         public Vector3 p2;
         public Vector3 PlaneX;
         public Vector3 PlaneY;
+        public Vector4 debugPlane;
 
 
-        public void SetFOV(float degrees) 
-        { 
-            float radians = (float)(Math.Clamp(degrees, 60, 120) * (Math.PI/180)); 
-            distanceToPlane = aspectRatio / MathF.Tan(radians / 2);
+        public void SetFOV(float degrees)
+        {
+            float radians = (float)(Math.Clamp(degrees, 60, 120) * (Math.PI / 180));
+            distanceToPlane = (PlaneX.Length * 0.5f) / MathF.Tan(radians / 2);
+            CurrentFOV = degrees;
             UpdateVectors();
         }
-        public void ChangeFOV(float degrees) { float newAngle = (float)(Math.Clamp(CurrentFOV + degrees, 60, 120) * Math.PI / 180); SetFOV(newAngle); }
+        public void ChangeFOV(float degrees) { float newAngle = (float)(Math.Clamp(CurrentFOV + degrees, 60, 120)); SetFOV(newAngle); }
 
-        public Camera(Surface screen, Vector3 Position, Vector3 Direction, Vector3 Up, float degrees, float exposure = 1)
+        public Camera(Surface screen, Vector3 Position, Vector3 Direction, Vector3 Up, float degrees)
         {
             this.screen = screen;
             this.Position = Position;
@@ -45,7 +40,6 @@ namespace Raytracing
             aspectRatio = (float)screen.width / (float)screen.height;
             this.Up = Vector3.Normalize(Up);
             SetFOV(degrees);
-            this.exposure = exposure;
         }
 
         public void UpdateVectors()
@@ -57,11 +51,12 @@ namespace Raytracing
             p2 = PlaneCenter - Up - (aspectRatio * Right);
             PlaneX = p1 - p0;
             PlaneY = p2 - p0;
+            debugPlane = (p0.Z, p0.X, p1.Z, p1.X);
         }
 
-        public Ray GetRayForPixelAt(float x, float y) 
-        { 
-            return new Ray(Position, Vector3.NormalizeFast(p0 + ((x / screen.width) * PlaneX) + ((y / screen.height) * PlaneY) - Position)); 
+        public Ray GetRayForPixelAt(float x, float y, int bouncemax, bool sendToDebug)
+        {
+            return new Ray(Position, Vector3.NormalizeFast(p0 + ((x / screen.width) * PlaneX) + ((y / screen.height) * PlaneY) - Position), bouncemax, 'p', sendToDebug);
         }
 
         public void MoveCamera(Vector3 relativeDirection, float degreePitch = 0, float degreeYaw = 0, float degreeRoll = 0, float fovChange = 0)

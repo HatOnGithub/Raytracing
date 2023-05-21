@@ -26,6 +26,11 @@ Implemented Minimum Requirements:
 		[QE] Yaw
 		[ZX] Roll
 
-Extra Features:
+Bonus Features:
+	- Antialiasing using multisampling
 	- Multithreading
+	- Triangle Primitive - including texturing and phong lighting
+	- Texture mapping on all objects
+	- Refraction (including reflected rays)
+	- A Skybox without adding a sphere or box object
 	

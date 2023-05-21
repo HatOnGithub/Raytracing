@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 
 namespace Raytracing
 {
@@ -18,8 +13,8 @@ namespace Raytracing
             Direction = Vector3.Normalize(vertices[2] - vertices[1]);
             Up = Vector3.Normalize(Vector3.Cross(Normal(new()), Direction));
         }
-        public Triangle(Vector3[] vertices, string path, MaterialType materialType, float reflectiveness = 0.5f) :
-            base(vertices[0], path, materialType, reflectiveness)
+        public Triangle(Vector3[] vertices, string imagePath, MaterialType materialType, float reflectiveness = 0.5f) :
+            base(vertices[0], imagePath, materialType, reflectiveness)
         {
             this.vertices = vertices;
             Direction = Vector3.Normalize(vertices[2] - vertices[1]);
@@ -32,13 +27,10 @@ namespace Raytracing
             Vector3 B = vertices[1];
             Vector3 C = vertices[2];
 
-            if (Vector3.Dot(ray.Direction, Vector3.Cross(B - A, C - A)) > 0)
-            {
-                B = vertices[2];
-                C = vertices[1];
-            }
-
             Vector3 normal = Vector3.Cross(B - A, C - A);
+
+            if (Vector3.Dot(ray.Direction, Vector3.Cross(B - A, C - A)) > 0) normal *= -1;
+
 
             float intersectDistance = Vector3.Dot(vertices[0] - ray.Origin, normal) / Vector3.Dot(ray.Direction, normal);
             Vector3 planeIntersection = ray.Origin + intersectDistance * ray.Direction;
@@ -58,10 +50,12 @@ namespace Raytracing
 
         public override Vector3 GetColorFromTextureAtIntersect(Vector3 IntersectPoint)
         {
+            return Vector3.One;
+
             int x, y;
 
-            x = (Texture.GetLength(0) - 1) * (int)Math.Round(Vector3.Dot(IntersectPoint - vertices[1], Direction) * (vertices[2] - vertices[1]).Length);
-            y = (Texture.GetLength(1) - 1) * (int)Math.Round(Vector3.Dot(IntersectPoint - vertices[1], Up) * Vector3.Dot(vertices[0] - vertices[1], Up));
+            x = (int)Math.Round((Texture.GetLength(0) - 1) * (Vector3.Dot(IntersectPoint - vertices[1], Direction) * (vertices[2] - vertices[1]).Length));
+            y = (int)Math.Round((Texture.GetLength(1) - 1) * (Vector3.Dot(IntersectPoint - vertices[1], Up) * Vector3.Dot(vertices[0] - vertices[1], Up)));
 
             return Texture[x, y];
         }
