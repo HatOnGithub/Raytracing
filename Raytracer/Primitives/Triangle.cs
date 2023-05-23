@@ -27,9 +27,9 @@ namespace Raytracing
             Vector3 B = vertices[1];
             Vector3 C = vertices[2];
 
-            Vector3 normal = Vector3.Cross(B - A, C - A);
+            Vector3 normal = Vector3.NormalizeFast(Vector3.Cross(B - A, C - A));
 
-            if (Vector3.Dot(ray.Direction, Vector3.Cross(B - A, C - A)) > 0) normal *= -1;
+            //if (Vector3.Dot(ray.Direction, normal) > 0) normal *= -1;
 
 
             float intersectDistance = Vector3.Dot(vertices[0] - ray.Origin, normal) / Vector3.Dot(ray.Direction, normal);
@@ -45,7 +45,7 @@ namespace Raytracing
 
         public override Vector3 Normal(Vector3 position)
         {
-            return Vector3.Cross(vertices[1] - vertices[0], vertices[2] - vertices[0]);
+            return Vector3.NormalizeFast(Vector3.Cross(vertices[1] - vertices[0], vertices[2] - vertices[0]));
         }
 
         public override Vector3 GetColorFromTextureAtIntersect(Vector3 IntersectPoint)

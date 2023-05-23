@@ -125,7 +125,8 @@ namespace Raytracing
 
                 if (prim.GetType() == typeof(Triangle))
                 {
-                    Vector3[] vertices = ((Triangle)prim).vertices;
+                    Vector3[] vertices = new Vector3[3];
+                    ((Triangle)prim).vertices.CopyTo(vertices, 0);
                     for (int i = 0; i < 3; i++) vertices[i] = (vertices[i] * M_to_Px);
                     debug.Line(
                         ViewTarget.X + (int)vertices[0].Z, ViewTarget.Y + (int)vertices[0].X,
