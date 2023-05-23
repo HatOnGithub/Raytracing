@@ -5,7 +5,6 @@ namespace Raytracing
     public class Triangle : Primitive
     {
         public Vector3[] vertices = new Vector3[3];
-        public Vector3[] Vertices { get { return new Vector3[3] { vertices[0], vertices[1], vertices[2] }; } }
 
         public Triangle(Vector3[] vertices, Vector3 Color, MaterialType materialType, float reflectiveness = 0.5f) :
             base(vertices[0], Color, materialType, reflectiveness)
@@ -30,7 +29,12 @@ namespace Raytracing
 
             Vector3 normal = Vector3.NormalizeFast(Vector3.Cross(B - A, C - A));
 
-            //if (Vector3.Dot(ray.Direction, normal) > 0) normal *= -1;
+            if (Vector3.Dot(ray.Direction, normal) > 0)
+            {
+                normal *= -1;
+                B = C;
+                C = vertices[1];
+            }
 
             float intersectDistance = Vector3.Dot(vertices[0] - ray.Origin, normal) / Vector3.Dot(ray.Direction, normal);
 
@@ -38,7 +42,8 @@ namespace Raytracing
 
             if (Vector3.Dot(Vector3.Cross(B - A, planeIntersection - A), normal) >= 0 &&
                 Vector3.Dot(Vector3.Cross(A - C, planeIntersection - C), normal) >= 0 &&
-                Vector3.Dot(Vector3.Cross(C - B, planeIntersection - B), normal) >= 0)
+                Vector3.Dot(Vector3.Cross(C - B, planeIntersection - B), normal) >= 0 &&
+                intersectDistance > 0)
                 return new(GetColorFromTextureAtIntersect(ray.Origin + ray.Direction * intersectDistance), intersectDistance, this);
 
             return new(ambientColor, float.NegativeInfinity, null);
@@ -51,7 +56,6 @@ namespace Raytracing
 
         public override Vector3 GetColorFromTextureAtIntersect(Vector3 IntersectPoint)
         {
-            return Vector3.One;
 
             int x, y;
 

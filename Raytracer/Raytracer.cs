@@ -51,17 +51,17 @@ namespace Raytracing
 
             scene.AddObjects(new Sphere(new(3, 0, -3), new Vector3(1, 1, 1), MaterialType.Mirror, 1, 1));
 
-            scene.AddObjects(new Triangle(new Vector3[3] { new(6, 2, -2), new(6, 6, 0), new(6, 2, 2) }, new Vector3(1, 1, 1), MaterialType.Diffuse, 1f));
+            scene.AddObjects(new Triangle(new Vector3[3] { new(6, -2, 4), new(6, 6, 0), new(6,-2, -4) }, new Vector3(1, 1, 1), MaterialType.Diffuse, 1f));
 
 
-            // scene.AddObjects(new Plane(new(0, -1, 0), new(0, 1, 0),"Textures/rockfloor.jpg", null, new(1,1.4f), MaterialType.Diffuse, 0.8f));
+            scene.AddObjects(new Plane(new(0, -1, 0), new(0, 1, 0),"Textures/rockfloor.jpg", new(1,1.4f), MaterialType.Diffuse, 0.8f));
 
-            //scene.AddObjects(new Plane(new(8, 0, 0), new(-1, 0, 0), "Textures/shrek.jpg", null, new( 1.78f,1), MaterialType.Diffuse, 0.8f));
-            //scene.AddObjects(new Plane(new(0, 0, -5), new(0, 0, 1), "Textures/shrek.jpg", null, new( 1.78f,1), MaterialType.Diffuse, 0.8f));
-            //scene.AddObjects(new Plane(new(0, 0, 5), new(0, 0, -1), "Textures/shrek.jpg", null, new( 1.78f,1), MaterialType.Diffuse, 0.8f));
-            //scene.AddObjects(new Plane(new(-5, 0, 0), new(1, 0, 0), "Textures/shrek.jpg", null, new( 1.78f, 1), MaterialType.Diffuse, 0.8f));
+            //scene.AddObjects(new Plane(new(8, 0, 0), new(-1, 0, 0), "Textures/shrek.jpg", new( 1.78f,1), MaterialType.Diffuse, 0.8f));
+            //scene.AddObjects(new Plane(new(0, 0, -5), new(0, 0, 1), "Textures/shrek.jpg", new( 1.78f,1), MaterialType.Diffuse, 0.8f));
+            //scene.AddObjects(new Plane(new(0, 0, 5), new(0, 0, -1), "Textures/shrek.jpg", new( 1.78f,1), MaterialType.Diffuse, 0.8f));
+            //scene.AddObjects(new Plane(new(-5, 0, 0), new(1, 0, 0), "Textures/shrek.jpg", new( 1.78f, 1), MaterialType.Diffuse, 0.8f));
 
-            scene.AddLight(new Light(new(0, 10, 0), new(1, 1, 1), 100));
+            scene.AddLight(new Light(new(3, 10, 0), new(1, 1, 1), 100));
             //scene.AddLight(new PlaneLight(new(0, 10, 0), new(0,-1,0), new(1,1,1), 100));
 
         }
@@ -155,7 +155,8 @@ namespace Raytracing
                             '2' => RGBtoINT(Color.Green),
                             's' => RGBtoINT(Color.Yellow),
                             'r' => RGBtoINT(Color.Blue),
-                            _ => RGBtoINT(Color.Red),
+                            'b' => RGBtoINT(Color.Red),
+                            _ => RGBtoINT(Color.Black),
                         };
                         ;
 
@@ -249,7 +250,6 @@ namespace Raytracing
         public Vector3 RecursiveRayShooter(Ray ray, Surface screen, ref List<Ray> debugRays, out IntersectData intersectData, Light? aimedLight = null)
         {
             Vector3 result = new();
-            bool rayBlocked = false;
             List<Primitive> prims = scene.Objects;
             List<Light> lights = scene.Lightsources;
             Primitive? prim = null;
@@ -266,24 +266,24 @@ namespace Raytracing
                     { 
                         prim = candidate;
                         data = candidateData;
-
-                        // if the ray is aimed at a light, check if the primitive blocks the ray between it and the light
-                        if (aimedLight != null && !rayBlocked)
-                            if (candidateData.distance >= (aimedLight.Position(ray.Origin) - ray.Origin).Length)
-                                rayBlocked = true;
                     }
+
+                    // if the ray is aimed at a light, check if the primitive blocks the ray between it and the light
+                    if (ray.raytype == 's' && aimedLight != null)
+                        if (candidateData.distance < (aimedLight.Position(ray.Origin) - ray.Origin).Length)
+                            ray.raytype = 'b';
                 }
             }
 
             // if there was a light and nothing blocks it, skip the primitive color calculation and go straight to the light return
 
-            if (prim != null && (aimedLight != null  && rayBlocked || aimedLight == null))
+            if (prim != null)
             {
                 Vector3 intersectPoint = ray.Origin + data.distance * ray.Direction;
 
                 Vector3 normal = Vector3.Dot(ray.Direction, prim.Normal(intersectPoint)) > 0 ? -prim.Normal(intersectPoint) : prim.Normal(intersectPoint);
 
-                Vector3 smallOffset = normal * 0.001f;
+                Vector3 epsilon = normal * 0.0001f;
 
                 
 
@@ -291,7 +291,7 @@ namespace Raytracing
                 if (ray.bouncesLeft > 0)
                 {
                     IntersectData returndata;
-                    Ray reflectedRay = new(intersectPoint + smallOffset, ray.Direction - (2 * Vector3.Dot(ray.Direction, normal)) * normal, ray.bouncesLeft - 1, '2', ray.sendToDebug);
+                    Ray reflectedRay = new(intersectPoint + epsilon, ray.Direction - (2 * Vector3.Dot(ray.Direction, normal)) * normal, ray.bouncesLeft - 1, '2', ray.sendToDebug);
 
                     // Algorithm derived from the slides
                     if (prim.materialType == MaterialType.Mirror)
@@ -304,9 +304,9 @@ namespace Raytracing
                     {
                         foreach (Light light in lights)
                         {
-                            Ray shadowRay = new(intersectPoint + smallOffset, light.Position(ray.Origin) - intersectPoint, ray.bouncesLeft - 1, 's', ray.sendToDebug);
+                            Ray shadowRay = new(intersectPoint + epsilon, light.Position(ray.Origin) - intersectPoint, ray.bouncesLeft - 1, 's', ray.sendToDebug);
                             Vector3 returnlight = RecursiveRayShooter(shadowRay, screen, ref debugRays, out returndata, light);
-                            result += DiffuseCalculation(shadowRay.Direction, prim.Normal(shadowRay.Origin), returnlight, prim.GetColorFromTextureAtIntersect(intersectPoint), (light.Position(intersectPoint) - intersectPoint - (smallOffset * 2)).LengthSquared);
+                            result += DiffuseCalculation(shadowRay.Direction, prim.Normal(shadowRay.Origin), returnlight, prim.GetColorFromTextureAtIntersect(intersectPoint), (light.Position(intersectPoint) - intersectPoint - (epsilon * 2)).LengthSquared);
                         }
 
                         result += RecursiveRayShooter(reflectedRay, screen, ref debugRays, out _) * (prim.reflectiveness * prim.GetColorFromTextureAtIntersect(intersectPoint)) * prim.reflectiveness;
@@ -317,9 +317,9 @@ namespace Raytracing
                     {
                         foreach (Light light in lights)
                         {
-                            Ray shadowRay = new(intersectPoint + smallOffset, light.Position(intersectPoint) - intersectPoint, ray.bouncesLeft - 1, 's', ray.sendToDebug);
+                            Ray shadowRay = new(intersectPoint + epsilon, light.Position(intersectPoint) - intersectPoint, ray.bouncesLeft - 1, 's', ray.sendToDebug);
                             Vector3 returnlight = RecursiveRayShooter(shadowRay, screen, ref debugRays, out returndata, light);
-                            result += DiffuseCalculation(shadowRay.Direction, prim.Normal(shadowRay.Origin), returnlight, prim.GetColorFromTextureAtIntersect(intersectPoint), (light.Position(intersectPoint) - intersectPoint - (smallOffset * 2)).LengthSquared);
+                            result += DiffuseCalculation(shadowRay.Direction, prim.Normal(shadowRay.Origin), returnlight, prim.GetColorFromTextureAtIntersect(intersectPoint), (light.Position(intersectPoint) - intersectPoint - (epsilon * 2)).LengthSquared);
                         }
 
                     }
@@ -330,7 +330,7 @@ namespace Raytracing
 
                         foreach (Light light in lights)
                         {
-                            Ray shadowRay = new(intersectPoint + smallOffset, light.Position(intersectPoint) - intersectPoint, ray.bouncesLeft - 1, 's', ray.sendToDebug);
+                            Ray shadowRay = new(intersectPoint + epsilon, light.Position(intersectPoint) - intersectPoint, ray.bouncesLeft - 1, 's', ray.sendToDebug);
                             Vector3 returnlight = RecursiveRayShooter(shadowRay, screen, ref debugRays, out returndata, light);
                             result += DiffuseGlossCalculation(shadowRay.Direction * -1, light.Position(shadowRay.Origin) - shadowRay.Origin, normal, returnlight, prim.SpecularColor, prim.GetColorFromTextureAtIntersect(intersectPoint), (light.Position(intersectPoint) - intersectPoint).LengthSquared, prim.specularity, prim.reflectiveness);
                         }
@@ -354,7 +354,7 @@ namespace Raytracing
                             reflectedRay.bouncesLeft--;
                             }
 
-                        reflectedRay = new(intersectPoint + smallOffset, ray.Direction - (2 * Vector3.Dot(ray.Direction, normal)) * normal, ray.bouncesLeft - 1, '2', ray.sendToDebug);
+                        reflectedRay = new(intersectPoint + epsilon, ray.Direction - (2 * Vector3.Dot(ray.Direction, normal)) * normal, ray.bouncesLeft - 1, '2', ray.sendToDebug);
 
                         float R, R0;
 
@@ -366,7 +366,7 @@ namespace Raytracing
                             R = R0 + MathF.Pow((1f - R0) * (1f - MathF.Cos(Vector3.CalculateAngle(ray.Direction, -normal))), 5);
 
                             Vector3 refractedRayDirection = (n / nt) * (d - Vector3.Dot(d, normal) * normal) - MathF.Sqrt(underTheRoot) * normal;
-                            Ray refractedRay = new(intersectPoint - smallOffset, refractedRayDirection, ray.bouncesLeft - 1, refractedRayType, ray.sendToDebug);
+                            Ray refractedRay = new(intersectPoint - epsilon, refractedRayDirection, ray.bouncesLeft - 1, refractedRayType, ray.sendToDebug);
 
                             // reflected
                             result += RecursiveRayShooter(reflectedRay, screen, ref debugRays, out _) * (prim.reflectiveness * prim.GetColorFromTextureAtIntersect(intersectPoint)) * R;
@@ -377,11 +377,21 @@ namespace Raytracing
                         }
 
                         else result = RecursiveRayShooter(reflectedRay, screen, ref debugRays, out _);
+
+
+                        
                     }
                 }
+
+                intersectData = data;
+                ray.intersectDistance = data.distance;
+                if (ray.sendToDebug) debugRays.Add(ray);
+                return result;
             }
+
+
             // if nothing blocks the ray between the source and the light, return the light color
-            if (aimedLight != null && !rayBlocked)
+            if (aimedLight != null)
             {
                 Vector3 lightPos = aimedLight.Position(ray.Origin);
                 if ((aimedLight.GetType() == typeof(PlaneLight) && lightPos.X != float.NegativeInfinity) || aimedLight.GetType() != typeof(PlaneLight))
@@ -391,15 +401,6 @@ namespace Raytracing
                     if (ray.sendToDebug) debugRays.Add(ray);
                     return aimedLight.Color;
                 }
-            }
-
-            // If there was something blocking it, return the resulting data
-            if (prim != null)
-            {
-                intersectData = data;
-                ray.intersectDistance = data.distance;
-                if (ray.sendToDebug) debugRays.Add(ray);
-                return result;
             }
 
             // if the ray is not aimed at a light, or the ray is blocked and there are no more bounces left, return the skybox
