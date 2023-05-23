@@ -348,7 +348,7 @@ namespace Raytracing
                             n = prim.refractiveIndex;
                             nt = 1;
                             reflectedRay.bouncesLeft--;
-                            }
+                        }
 
                         reflectedRay = new(intersectPoint + epsilon, ray.Direction - (2 * Vector3.Dot(ray.Direction, normal)) * normal, ray.bouncesLeft - 1, '2', ray.sendToDebug);
 
