@@ -25,12 +25,12 @@ namespace Raytracing
 
         public void SetFOV(float degrees)
         {
-            float radians = (float)(Math.Clamp(degrees, 60, 120) * (Math.PI / 180));
+            float radians = (float)(Math.Clamp(degrees, 60, 160) * (Math.PI / 180));
             distanceToPlane = (PlaneX.Length * 0.5f) / MathF.Tan(radians / 2);
             CurrentFOV = degrees;
             UpdateVectors();
         }
-        public void ChangeFOV(float degrees) { float newAngle = (float)(Math.Clamp(CurrentFOV + degrees, 60, 120)); SetFOV(newAngle); }
+        public void ChangeFOV(float degrees) { float newAngle = (float)(Math.Clamp(CurrentFOV + degrees, 60, 160)); SetFOV(newAngle); }
 
         public Camera(Surface screen, Vector3 Position, Vector3 Direction, Vector3 Up, float degrees)
         {

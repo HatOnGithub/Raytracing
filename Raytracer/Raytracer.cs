@@ -5,20 +5,19 @@ namespace Raytracing
 {
     public class Raytracer
     {
-        const int bouncelimit = 6; // how deep can the ray go?
-        const int AntiAliasing = 1; // degree of supersampling, 2^n where n is the value you enter
+        const int bouncelimit = 10; // how deep can the ray go?
+        const int AntiAliasing = 2; // degree of supersampling, 2^n where n is the value you enter
 
 
-        public Surface screen;
-        public Surface debug;
+        public Surface screen, debug;
         public Scene scene;
         public Camera camera;
-        static readonly int screenDivisions = (int)MathF.Sqrt(ThreadPool.ThreadCount);
-        static readonly bool[,] screenPortions = new bool[screenDivisions, screenDivisions];
+        public static readonly int screenDivisions = (int)MathF.Sqrt(ThreadPool.ThreadCount);
+        public bool[,] screenPortions = new bool[screenDivisions, screenDivisions];
         static readonly Vector3[,] SkyboxTexture = ImageLoader.LoadFromFile("Textures/skybox.jpg");
         static readonly List<Ray>[,] debugRayArray = new List<Ray>[screenDivisions, screenDivisions];
         Vector2i ViewTarget => new Vector2i((int)(debug.width * 0.5f), (int)(debug.height * 0.125f)) - (Vector2i)(new Vector2(camera.Position.Z, camera.Position.X) * M_to_Px);
-
+        Vector2i singleSize => new(screen.width / screenDivisions, screen.height / screenDivisions);
 
         // Camera initialization values
         static Vector3 eyePosition = new(-2, 0, 0);
@@ -125,7 +124,7 @@ namespace Raytracing
 
                 if (prim.GetType() == typeof(Triangle))
                 {
-                    Vector3[] vertices = ((Triangle)prim).vertices;
+                    Vector3[] vertices = ((Triangle)prim).Vertices;
                     for (int i = 0; i < 3; i++) vertices[i] = (vertices[i] * M_to_Px);
                     debug.Line(
                         ViewTarget.X + (int)vertices[0].Z, ViewTarget.Y + (int)vertices[0].X,
@@ -182,7 +181,7 @@ namespace Raytracing
         /// <returns></returns>
         public Vector4i GetAssignment()
         {
-            Vector2i singleSize = new(screen.width / screenDivisions, screen.height / screenDivisions);
+            
             for (int y = 0; y < screenDivisions; y++)
                 for (int x = 0; x < screenDivisions; x++) if (!screenPortions[x, y])
                     {
@@ -219,7 +218,7 @@ namespace Raytracing
                         for (float xoffset = 0; xoffset < AntiAliasing; xoffset++)
                         {
                             Ray ray = camera.GetRayForPixelAt(x + (xoffset / AntiAliasing), y + (yoffset / AntiAliasing), bouncelimit,
-                                y == screen.height / 2 && x % ((int)((screen.width - 1) / raysShown)) == 0);
+                                y == screen.height / 2 && x % ((int)((screen.width - 1) / raysShown)) == 0 && yoffset == 0 && xoffset == 0);
                             color += RecursiveRayShooter(ray, screen, ref debugRays, out _);
                         }
                     color /= AntiAliasing * AntiAliasing;
@@ -262,27 +261,36 @@ namespace Raytracing
                 if (candidateData.intersectedPrimitive != null && candidateData.distance > 0)
                 {
                     if (prim == null) { prim = candidate; data = candidateData; }
-                    else if (data.distance > candidateData.distance) { prim = candidate; data = candidateData; }
+                    else if (data.distance > candidateData.distance) 
+                    { 
+                        prim = candidate;
+                        data = candidateData;
+
+                        // if the ray is aimed at a light, check if the primitive blocks the ray between it and the light
+                        if (aimedLight != null && !rayBlocked)
+                            if (candidateData.distance >= (aimedLight.Position(ray.Origin) - ray.Origin).Length)
+                                rayBlocked = true;
+                    }
                 }
             }
 
+            // if there was a light and nothing blocks it, skip the primitive color calculation and go straight to the light return
 
-            if (prim != null)
+            if (prim != null && (aimedLight != null  && rayBlocked || aimedLight == null))
             {
-
                 Vector3 intersectPoint = ray.Origin + data.distance * ray.Direction;
-                Vector3 smallOffset = prim.Normal(intersectPoint) * 0.001f;
 
-                // if the ray is aimed at a light, check if the primitive blocks the ray between it and the light
-                if (aimedLight != null)
-                    if (data.distance <= Vector3.Dot(aimedLight.Position(ray.Origin) - intersectPoint - smallOffset, ray.Direction))
-                        rayBlocked = true;
+                Vector3 normal = Vector3.Dot(ray.Direction, prim.Normal(intersectPoint)) > 0 ? -prim.Normal(intersectPoint) : prim.Normal(intersectPoint);
+
+                Vector3 smallOffset = normal * 0.001f;
+
+                
 
                 // if the ray bounce limit hasn't been reached, send out new shadow rays
                 if (ray.bouncesLeft > 0)
                 {
                     IntersectData returndata;
-                    Ray reflectedRay = new(intersectPoint + smallOffset, ray.Direction - (2 * Vector3.Dot(ray.Direction, prim.Normal(intersectPoint))) * prim.Normal(intersectPoint), ray.bouncesLeft - 1, '2', ray.sendToDebug);
+                    Ray reflectedRay = new(intersectPoint + smallOffset, ray.Direction - (2 * Vector3.Dot(ray.Direction, normal)) * normal, ray.bouncesLeft - 1, '2', ray.sendToDebug);
 
                     // Algorithm derived from the slides
                     if (prim.materialType == MaterialType.Mirror)
@@ -323,7 +331,7 @@ namespace Raytracing
                         {
                             Ray shadowRay = new(intersectPoint + smallOffset, light.Position(intersectPoint) - intersectPoint, ray.bouncesLeft - 1, 's', ray.sendToDebug);
                             Vector3 returnlight = RecursiveRayShooter(shadowRay, screen, ref debugRays, out returndata, light);
-                            result += DiffuseGlossCalculation(shadowRay.Direction * -1, light.Position(shadowRay.Origin) - shadowRay.Origin, prim.Normal(intersectPoint), returnlight, prim.SpecularColor, prim.GetColorFromTextureAtIntersect(intersectPoint), (light.Position(intersectPoint) - intersectPoint).LengthSquared, prim.specularity, prim.reflectiveness);
+                            result += DiffuseGlossCalculation(shadowRay.Direction * -1, light.Position(shadowRay.Origin) - shadowRay.Origin, normal, returnlight, prim.SpecularColor, prim.GetColorFromTextureAtIntersect(intersectPoint), (light.Position(intersectPoint) - intersectPoint).LengthSquared, prim.specularity, prim.reflectiveness);
                         }
 
                     }
@@ -332,20 +340,18 @@ namespace Raytracing
                     // Algorithm derived from the slides
                     else if (prim.materialType == MaterialType.Transparent)
                     {
-                        Vector3 normal = prim.Normal(intersectPoint);
                         float n = 1;
                         float nt = prim.refractiveIndex;
                         Vector3 d = ray.Direction;
                         char refractedRayType = 'r';
 
                         // if the ray originated inside the object, invert breaking indeces and normal
-                        if (Vector3.Dot(ray.Direction, normal) > 0)
+                        if (prim.GetType() == typeof(Sphere)) if ((ray.Origin - prim.Position).Length < ((Sphere)prim).radius)
                         {
                             n = prim.refractiveIndex;
                             nt = 1;
-                            normal *= -1;
-                            smallOffset = normal * 0.0001f;
-                        }
+                            reflectedRay.bouncesLeft--;
+                            }
 
                         reflectedRay = new(intersectPoint + smallOffset, ray.Direction - (2 * Vector3.Dot(ray.Direction, normal)) * normal, ray.bouncesLeft - 1, '2', ray.sendToDebug);
 
