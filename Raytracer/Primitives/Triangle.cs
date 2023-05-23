@@ -5,20 +5,23 @@ namespace Raytracing
     public class Triangle : Primitive
     {
         public Vector3[] vertices = new Vector3[3];
+        public float Area;
 
         public Triangle(Vector3[] vertices, Vector3 Color, MaterialType materialType, float reflectiveness = 0.5f) :
             base(vertices[0], Color, materialType, reflectiveness)
         {
             this.vertices = vertices;
-            Direction = Vector3.Normalize(vertices[2] - vertices[1]);
-            Up = Vector3.Normalize(Vector3.Cross(Normal(new()), Direction));
+            Vector3 AB = vertices[1] - vertices[0];
+            Vector3 AC = vertices[2] - vertices[0];
+            Area = Area = Vector3.Dot(Normal(new()), Vector3.Cross(AB, AC));
         }
         public Triangle(Vector3[] vertices, string imagePath, MaterialType materialType, float reflectiveness = 0.5f) :
             base(vertices[0], imagePath, materialType, reflectiveness)
         {
             this.vertices = vertices;
-            Direction = Vector3.Normalize(vertices[2] - vertices[1]);
-            Up = Vector3.Normalize(Vector3.Cross(Normal(new()), Direction));
+            Vector3 AB = vertices[1] - vertices[0];
+            Vector3 AC = vertices[2] - vertices[0];
+            Area = Vector3.Dot(Normal(new()), Vector3.Cross(AB, AC));
         }
 
         public override IntersectData Intersect(Ray ray)
@@ -54,15 +57,27 @@ namespace Raytracing
             return Vector3.NormalizeFast(Vector3.Cross(vertices[1] - vertices[0], vertices[2] - vertices[0]));
         }
 
-        public override Vector3 GetColorFromTextureAtIntersect(Vector3 IntersectPoint)
+        public override Vector3 GetColorFromTextureAtIntersect(Vector3 P)
         {
 
             int x, y;
+            
+            Vector3 A = vertices[0];
+            Vector3 B = vertices[1];
+            Vector3 C = vertices[2];
+            Vector3 n = Normal(new());
 
-            x = (int)Math.Round((Texture.GetLength(0) - 1) * (Vector3.Dot(IntersectPoint - vertices[1], Direction) * (vertices[2] - vertices[1]).Length));
-            y = (int)Math.Round((Texture.GetLength(1) - 1) * (Vector3.Dot(IntersectPoint - vertices[1], Up) * Vector3.Dot(vertices[0] - vertices[1], Up)));
+            float alpha = (Vector3.Dot(Vector3.Cross(C - B, P - B), n)) / Area;
+            float beta  = (Vector3.Dot(Vector3.Cross(A - C, P - C), n)) / Area;
+            float gamma = (Vector3.Dot(Vector3.Cross(B - A, P - A), n)) / Area;
 
-            return Texture[x, y];
+            Vector2 Auv = new(Texture.GetLength(0), Texture.GetLength(1));
+            Vector2 Buv = new(Texture.GetLength(0) / 2, 0);
+            Vector2 Cuv = new(0, Texture.GetLength(1));
+
+            Vector2 Puv = (alpha * Auv) + (beta * Buv) + (gamma * Cuv);
+
+            return Texture[(int)Puv.X, (int)Puv.Y];
         }
     }
 }

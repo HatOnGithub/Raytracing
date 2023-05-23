@@ -195,9 +195,9 @@ namespace Raytracing
             }
         }
 
-        public void DrawSphere(Vector2 Center, float radius, int color)
+        public void DrawSphere(Vector2 Center, float radius, float MToPx, int color)
         {
-            int numberOfPixels = (int)Math.Ceiling((radius * 2) * (2 * MathF.PI)); // circumference in radians ( x2 to mitigate gaps in the circle)
+            int numberOfPixels = (int)Math.Ceiling((radius * MToPx) * (2 * MathF.PI)); // circumference in radians ( x2 to mitigate gaps in the circle)
             float angleUnit = numberOfPixels / (2 * MathF.PI);
             for (int i = 0; i < numberOfPixels; i++)
             {

@@ -86,6 +86,15 @@ namespace Raytracing
                 yaw * yawSpeed * (float)e.Time,
                 roll * rollSpeed * (float)e.Time,
                 fovChange * fovChangeSpeed * (float)e.Time);
+
+
+            float raysPerSecond = 2 * (float)e.Time;
+            if (keyboard[Keys.Right]) raytracer.raysShownf += raysPerSecond;
+            if (keyboard[Keys.Left]) raytracer.raysShownf = MathF.Max(2, raytracer.raysShownf - raysPerSecond);
+
+            float mtopxchange = 10 * (float)e.Time;
+            if (keyboard[Keys.Up]) raytracer.M_to_Px += mtopxchange;
+            if (keyboard[Keys.Down]) raytracer.M_to_Px = MathF.Max(0, raytracer.M_to_Px - mtopxchange);
         }
 
         public static int RGBtoINT(int r, int g, int b) { return (b << 16) + (g << 8) + r; }

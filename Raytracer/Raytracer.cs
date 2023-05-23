@@ -5,7 +5,7 @@ namespace Raytracing
 {
     public class Raytracer
     {
-        const int bouncelimit = 10; // how deep can the ray go?
+        const int bouncelimit = 4; // how deep can the ray go?
         const int AntiAliasing = 2; // degree of supersampling, 2^n where n is the value you enter
 
 
@@ -28,8 +28,9 @@ namespace Raytracing
 
 
         // values pertaining to debug view
-        const float M_to_Px = 50; // conversion from meter to pixels
-        const int raysShown = 12;
+        public float M_to_Px = 50; // conversion from meter to pixels
+        public int raysShown => (int) Math.Round(raysShownf);
+        public float raysShownf = 12;
 
 
         /// <summary>
@@ -45,24 +46,22 @@ namespace Raytracing
             camera = new Camera(screen, eyePosition, viewingDirection, Up, FOV); ;
             scene = new Scene();
 
-            scene.AddObjects(new Sphere(new(3, 0, 0), "Textures/Rockbits4.jpg", MaterialType.Diffuse, 1, 0.5f, 1.5f) { Direction = new(-0.5f, 0, 0.5f) });
+            scene.AddObjects(new Sphere(new(3, 0, 0.95f), "Textures/Rockbits4.jpg", MaterialType.Diffuse, 0.7f, 0.5f, 1.5f) { Direction = new(-0.5f, 0, 0.5f) });
 
-            scene.AddObjects(new Sphere(new(3, 0, 3), new Vector3(1, 1, 1), MaterialType.Transparent, 1, 0.8f));
+            scene.AddObjects(new Sphere(new(3, 0, -0.95f), "Textures/copperSphere.jpg", MaterialType.Gloss, 0.7f, 1, 1.6f) { Direction = new(-0.5f, 0, 0.5f) });
 
-            scene.AddObjects(new Sphere(new(3, 0, -3), new Vector3(1, 1, 1), MaterialType.Mirror, 1, 1));
+            scene.AddObjects(new Sphere(new(3, 0, 3.1f), new Vector3(1, 1, 1), MaterialType.Transparent, 0.7f, 0.8f));
 
-            scene.AddObjects(new Triangle(new Vector3[3] { new(6, -2, 4), new(6, 6, 0), new(6,-2, -4) }, new Vector3(1, 1, 1), MaterialType.Diffuse, 1f));
+            scene.AddObjects(new Sphere(new(3, 0, -3.1f), new Vector3(1, 1, 1), MaterialType.Mirror, 0.7f, 1));
+
+            scene.AddObjects(new Triangle(new Vector3[3] { new(6, -2, 4), new(6, 6, 0), new(6,-2, -4) }, "Textures/heresJohnny.jpg", MaterialType.DiffuseMirror, 0.9f));
 
 
-            scene.AddObjects(new Plane(new(0, -1, 0), new(0, 1, 0),"Textures/rockfloor.jpg", new(1,1.4f), MaterialType.Diffuse, 0.8f));
+            scene.AddObjects(new Plane(new(0, -0.7f, 0), new(0, 1, 0),"Textures/rockfloor.jpg", new(1,1.4f), MaterialType.Diffuse, 0.8f));
 
-            //scene.AddObjects(new Plane(new(8, 0, 0), new(-1, 0, 0), "Textures/shrek.jpg", new( 1.78f,1), MaterialType.Diffuse, 0.8f));
-            //scene.AddObjects(new Plane(new(0, 0, -5), new(0, 0, 1), "Textures/shrek.jpg", new( 1.78f,1), MaterialType.Diffuse, 0.8f));
-            //scene.AddObjects(new Plane(new(0, 0, 5), new(0, 0, -1), "Textures/shrek.jpg", new( 1.78f,1), MaterialType.Diffuse, 0.8f));
-            //scene.AddObjects(new Plane(new(-5, 0, 0), new(1, 0, 0), "Textures/shrek.jpg", new( 1.78f, 1), MaterialType.Diffuse, 0.8f));
-
-            scene.AddLight(new Light(new(3, 10, 0), new(1, 1, 1), 100));
-            //scene.AddLight(new PlaneLight(new(0, 10, 0), new(0,-1,0), new(1,1,1), 100));
+            scene.AddLight(new Light(new(0, 10, -5), new(1, 1, 1), 50));
+            scene.AddLight(new Light(new(0, 10, 5), new(1, 1, 1), 50));
+            //scene.AddLight(new PlaneLight(new(0, 10, 0), new(0,-1,0), new(1,1,1), 20));
 
         }
 
@@ -111,7 +110,7 @@ namespace Raytracing
             foreach (Light light in scene.Lightsources)
             {
                 debug.Plot((int)(ViewTarget.X + light.Position(camera.Position).Z * M_to_Px), (int)(ViewTarget.Y + light.Position(camera.Position).X * M_to_Px), RGBtoINT(light.Color));
-                debug.DrawSphere(ViewTarget + (new Vector2(light.Position(camera.Position).Z * M_to_Px, light.Position(camera.Position).X * M_to_Px)), 0.05f * M_to_Px, RGBtoINT(light.Color));
+                debug.DrawSphere(ViewTarget + (new Vector2(light.Position(camera.Position).Z * M_to_Px, light.Position(camera.Position).X * M_to_Px)), 0.05f * M_to_Px, M_to_Px, RGBtoINT(light.Color));
             }
 
 
@@ -120,7 +119,7 @@ namespace Raytracing
             foreach (Primitive prim in scene.Objects)
             {
                 if (prim.GetType() == typeof(Sphere))
-                    debug.DrawSphere(ViewTarget + (new Vector2(prim.Position.Z * M_to_Px, prim.Position.X * M_to_Px)), ((Sphere)prim).radius * M_to_Px, RGBtoINT(prim.averageColor));
+                    debug.DrawSphere(ViewTarget + (new Vector2(prim.Position.Z * M_to_Px, prim.Position.X * M_to_Px)), ((Sphere)prim).radius * M_to_Px, M_to_Px, RGBtoINT(prim.averageColor));
 
                 if (prim.GetType() == typeof(Triangle))
                 {
@@ -151,11 +150,10 @@ namespace Raytracing
                     {
                         var color = ray.raytype switch
                         {
-                            'p' => RGBtoINT(Color.White),
+                            'p' => RGBtoINT(Color.Red),
                             '2' => RGBtoINT(Color.Green),
                             's' => RGBtoINT(Color.Yellow),
                             'r' => RGBtoINT(Color.Blue),
-                            'b' => RGBtoINT(Color.Red),
                             _ => RGBtoINT(Color.Black),
                         };
                         ;
@@ -170,10 +168,13 @@ namespace Raytracing
                             color);
                     }
 
-            debug.Print("White  = Primary Ray", 10, 10, RGBtoINT(Color.White));
+            debug.Print("Red    = Primary Ray", 10, 10, RGBtoINT(Color.Red));
             debug.Print("Green  = Reflected Ray", 10, 35, RGBtoINT(Color.Green));
             debug.Print("Blue   = Refracted Ray", 10, 60, RGBtoINT(Color.Blue));
             debug.Print("Yellow = Shadow Ray", 10, 85, RGBtoINT(Color.Yellow));
+            debug.Print("Number of Rays: " + raysShown, 10, 110, RGBtoINT(Color.White));
+            debug.Print("Pixels per Meter: " + Math.Round((decimal)M_to_Px, 2).ToString(), 10, 135, RGBtoINT(Color.White));
+            debug.Print("Field of View: " + Math.Round(camera.CurrentFOV, 1), 10, 160, RGBtoINT(Color.White));
         }
 
 
@@ -220,7 +221,7 @@ namespace Raytracing
                         for (float xoffset = 0; xoffset < AntiAliasing; xoffset++)
                         {
                             Ray ray = camera.GetRayForPixelAt(x + (xoffset / AntiAliasing), y + (yoffset / AntiAliasing), bouncelimit,
-                                y == screen.height / 2 && x % ((int)((screen.width - 1) / raysShown)) == 0 && yoffset == 0 && xoffset == 0);
+                                y == screen.height / 2 && x % ((int)((screen.width - 1) / (raysShown - 1))) == 0 && yoffset == 0 && xoffset == 0);
                             color += RecursiveRayShooter(ray, screen, ref debugRays, out _);
                         }
                     color /= AntiAliasing * AntiAliasing;
@@ -267,11 +268,6 @@ namespace Raytracing
                         prim = candidate;
                         data = candidateData;
                     }
-
-                    // if the ray is aimed at a light, check if the primitive blocks the ray between it and the light
-                    if (ray.raytype == 's' && aimedLight != null)
-                        if (candidateData.distance < (aimedLight.Position(ray.Origin) - ray.Origin).Length)
-                            ray.raytype = 'b';
                 }
             }
 
@@ -332,7 +328,7 @@ namespace Raytracing
                         {
                             Ray shadowRay = new(intersectPoint + epsilon, light.Position(intersectPoint) - intersectPoint, ray.bouncesLeft - 1, 's', ray.sendToDebug);
                             Vector3 returnlight = RecursiveRayShooter(shadowRay, screen, ref debugRays, out returndata, light);
-                            result += DiffuseGlossCalculation(shadowRay.Direction * -1, light.Position(shadowRay.Origin) - shadowRay.Origin, normal, returnlight, prim.SpecularColor, prim.GetColorFromTextureAtIntersect(intersectPoint), (light.Position(intersectPoint) - intersectPoint).LengthSquared, prim.specularity, prim.reflectiveness);
+                            result += DiffuseGlossCalculation(ray.Direction, light.Position(intersectPoint) - intersectPoint, normal, returnlight, prim.SpecularColor, prim.GetColorFromTextureAtIntersect(intersectPoint), (light.Position(intersectPoint) - intersectPoint).LengthSquared, prim.specularity, prim.reflectiveness);
                         }
 
                     }
@@ -445,7 +441,7 @@ namespace Raytracing
 
             // calculate diffuse and specular components
             Vector3 diffuseComponent = MathF.Max(0, Vector3.Dot(normal, toLight)) * diffuseColor * reflectiveness;
-            Vector3 specularComponent = MathF.Pow(MathF.Max(0, Vector3.Dot(toOrigin, Vector3.NormalizeFast(toLight - 2 * Vector3.Dot(toLight, normal) * normal))), specularity) * specularColor;
+            Vector3 specularComponent = MathF.Pow(MathF.Max(0, Vector3.Dot(toOrigin, toLight - 2 * Vector3.Dot(toLight, normal) * normal)), specularity) * specularColor;
             return (Scene.AmbientLight * diffuseColor) + distanceAttenuatedLight * (diffuseComponent + specularComponent);
         }
 
