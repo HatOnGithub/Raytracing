@@ -104,7 +104,9 @@ namespace Raytracing
                 hor = (p0p1 + p2p3) / 2,
                 ver = (p0p2 + p1p3) / 2;
             
-
+            //0---1
+            //|-+-|
+            //2---3
             debug.Line(
                 (int)p0p1.X + ViewTarget.X, (int)p0p1.Y + ViewTarget.Y, (int)p0p1.Z + ViewTarget.X, (int)p0p1.W + ViewTarget.Y,
                 RGBtoINT(Color.White));
