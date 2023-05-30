@@ -10,7 +10,7 @@ namespace Raytracing
             return this.position;
         }
         public Vector3 Color;
-        Vector3 originalColor;
+        private Vector3 originalColor;
         public float Intensity { get { return Color.Length; } set { Color = originalColor * value; } }
 
         public Light(Vector3 Position, Vector3 Color, float Intensity)

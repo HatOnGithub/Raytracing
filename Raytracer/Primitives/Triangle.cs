@@ -59,16 +59,13 @@ namespace Raytracing
 
         public override Vector3 GetColorFromTextureAtIntersect(Vector3 P)
         {
-
-            int x, y;
-            
             Vector3 A = vertices[0];
             Vector3 B = vertices[1];
             Vector3 C = vertices[2];
             Vector3 n = Normal(new());
 
             float alpha = (Vector3.Dot(Vector3.Cross(C - B, P - B), n)) / Area;
-            float beta  = (Vector3.Dot(Vector3.Cross(A - C, P - C), n)) / Area;
+            float beta = (Vector3.Dot(Vector3.Cross(A - C, P - C), n)) / Area;
             float gamma = (Vector3.Dot(Vector3.Cross(B - A, P - A), n)) / Area;
 
             Vector2 Auv = new(Texture.GetLength(0), Texture.GetLength(1));
@@ -76,6 +73,8 @@ namespace Raytracing
             Vector2 Cuv = new(0, Texture.GetLength(1));
 
             Vector2 Puv = (alpha * Auv) + (beta * Buv) + (gamma * Cuv);
+
+            if (Puv.X >= Texture.GetLength(0) || Puv.Y >= Texture.GetLength(1)) return averageColor;
 
             return Texture[(int)Puv.X, (int)Puv.Y];
         }

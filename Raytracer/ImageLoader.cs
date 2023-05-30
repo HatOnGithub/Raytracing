@@ -4,7 +4,7 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace Raytracing
 {
-    static class ImageLoader
+    internal static class ImageLoader
     {
         public static Vector3[,] LoadFromFile(string path)
         {

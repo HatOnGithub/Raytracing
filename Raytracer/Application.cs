@@ -5,7 +5,7 @@ namespace Raytracing
     using OpenTK.Windowing.GraphicsLibraryFramework;
     using System.Drawing;
 
-    class Application
+    internal class Application
     {
         // member variables
         public Surface screen;
@@ -30,7 +30,7 @@ namespace Raytracing
             this.debug = debug;
         }
         // initialize
-        public void Init()
+        public static void Init()
         {
 
         }
@@ -55,46 +55,51 @@ namespace Raytracing
 
         public void HandleInput(FrameEventArgs e, KeyboardState keyboard)
         {
-            Vector3 movement = new();
-            float pitch = 0;
-            float yaw = 0;
-            float roll = 0;
-            float fovChange = 0;
+            
+            
+            
+            if (raytracer!= null)
+            {
+                Vector3 movement = new();
+                float pitch = 0;
+                float yaw = 0;
+                float roll = 0;
+                float fovChange = 0;
+                float raysPerSecond = 2 * (float)e.Time;
+                float mtopxchange = 10 * (float)e.Time;
 
-            if (keyboard[Keys.W]) movement.X += 1;
-            if (keyboard[Keys.A]) movement.Z -= 1;
-            if (keyboard[Keys.S]) movement.X -= 1;
-            if (keyboard[Keys.D]) movement.Z += 1;
-            if (keyboard[Keys.Space]) movement.Y += 1;
-            if (keyboard[Keys.LeftShift]) movement.Y -= 1;
+                if (keyboard[Keys.W]) movement.X += 1;
+                if (keyboard[Keys.A]) movement.Z -= 1;
+                if (keyboard[Keys.S]) movement.X -= 1;
+                if (keyboard[Keys.D]) movement.Z += 1;
+                if (keyboard[Keys.Space]) movement.Y += 1;
+                if (keyboard[Keys.LeftShift]) movement.Y -= 1;
 
-            if (keyboard[Keys.Q]) yaw -= 1;
-            if (keyboard[Keys.E]) yaw += 1;
+                if (keyboard[Keys.Q]) yaw -= 1;
+                if (keyboard[Keys.E]) yaw += 1;
 
-            if (keyboard[Keys.R]) pitch -= 1;
-            if (keyboard[Keys.F]) pitch += 1;
+                if (keyboard[Keys.R]) pitch -= 1;
+                if (keyboard[Keys.F]) pitch += 1;
 
-            if (keyboard[Keys.Z]) roll += 1;
-            if (keyboard[Keys.X]) roll -= 1;
+                if (keyboard[Keys.Z]) roll += 1;
+                if (keyboard[Keys.X]) roll -= 1;
 
-            if (keyboard[Keys.T]) fovChange += 1;
-            if (keyboard[Keys.G]) fovChange -= 1;
+                if (keyboard[Keys.T]) fovChange += 1;
+                if (keyboard[Keys.G]) fovChange -= 1;
 
-            raytracer?.camera.MoveCamera(
+                raytracer.camera.MoveCamera(
                 movement * movementspeed * (float)e.Time,
                 pitch * pitchSpeed * (float)e.Time,
                 yaw * yawSpeed * (float)e.Time,
                 roll * rollSpeed * (float)e.Time,
                 fovChange * fovChangeSpeed * (float)e.Time);
 
+                if (keyboard[Keys.Right]) raytracer.raysShownf += raysPerSecond;
+                if (keyboard[Keys.Left]) raytracer.raysShownf = MathF.Max(2, raytracer.raysShownf - raysPerSecond);
 
-            float raysPerSecond = 2 * (float)e.Time;
-            if (keyboard[Keys.Right]) raytracer.raysShownf += raysPerSecond;
-            if (keyboard[Keys.Left]) raytracer.raysShownf = MathF.Max(2, raytracer.raysShownf - raysPerSecond);
-
-            float mtopxchange = 10 * (float)e.Time;
-            if (keyboard[Keys.Up]) raytracer.M_to_Px += mtopxchange;
-            if (keyboard[Keys.Down]) raytracer.M_to_Px = MathF.Max(0, raytracer.M_to_Px - mtopxchange);
+                if (keyboard[Keys.Up]) raytracer.M_to_Px += mtopxchange;
+                if (keyboard[Keys.Down]) raytracer.M_to_Px = MathF.Max(0, raytracer.M_to_Px - mtopxchange);
+            }
         }
 
         public static int RGBtoINT(int r, int g, int b) { return (b << 16) + (g << 8) + r; }

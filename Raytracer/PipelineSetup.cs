@@ -66,7 +66,7 @@ namespace Raytracing
             SetupVAO(ref VAOdebug, ref VAOdebug, verticesdebug);
 
 
-            app.Init();
+            Application.Init();
         }
         protected override void OnUnload()
         {
@@ -79,15 +79,19 @@ namespace Raytracing
             base.OnResize(e);
             // called upon window resize. Note: does not change the size of the pixel buffer.
             GL.Viewport(0, 0, ClientSize.X, ClientSize.Y);
-            app.screen.width = ClientSize.X / 2;
-            app.screen.height = ClientSize.Y;
-            app.screen.pixels = new int[ClientSize.X/2 * ClientSize.Y];
 
-            app.debug.width = ClientSize.X / 2;
-            app.debug.height = ClientSize.Y;
-            app.debug.pixels = new int[ClientSize.X / 2 * ClientSize.Y];
+            if (app!= null)
+            {
+                app.screen.width = ClientSize.X / 2;
+                app.screen.height = ClientSize.Y;
+                app.screen.pixels = new int[ClientSize.X / 2 * ClientSize.Y];
 
-            if (app.raytracer != null) app.raytracer.screenPortions = new bool[Raytracer.screenDivisions, Raytracer.screenDivisions];
+                app.debug.width = ClientSize.X / 2;
+                app.debug.height = ClientSize.Y;
+                app.debug.pixels = new int[ClientSize.X / 2 * ClientSize.Y];
+
+                if (app.raytracer != null) app.raytracer.screenPortions = new bool[Raytracer.screenDivisions, Raytracer.screenDivisions];
+            }
         }
         protected override void OnUpdateFrame(FrameEventArgs e)
         {

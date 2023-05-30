@@ -50,10 +50,9 @@ namespace Raytracing
             float numerator = Vector3.Dot(p0 - l0, n);
             float denominator = Vector3.Dot(l, n);
             float division = numerator / denominator;
-            float intersectDistance;
+            float intersectDistance = float.NegativeInfinity;
 
-            if (division < 0 || denominator == 0 || numerator == 0 || Vector3.Dot(l, n) > 0) intersectDistance = float.NegativeInfinity;
-            else intersectDistance = division;
+            if (!(division < 0 || denominator == 0 || numerator == 0 || Vector3.Dot(l, n) > 0)) intersectDistance = division;
 
             if (intersectDistance > 0) return new(GetColorFromTextureAtIntersect(ray.Origin + ray.Direction * intersectDistance), intersectDistance, this);
             return new(ambientColor, intersectDistance, null);
@@ -63,24 +62,15 @@ namespace Raytracing
 
         public override Vector3 GetColorFromTextureAtIntersect(Vector3 IntersectPoint)
         {
-            double x, y;
-
             // tiles the plane regularly according to the given size a texture should be on the plane in meters
-            x = (Vector3.Dot(IntersectPoint - Position, Direction) % TextureDimensions.X) / TextureDimensions.X;
-            y = (Vector3.Dot(IntersectPoint - Position, Up) % TextureDimensions.Y) / TextureDimensions.Y;
+            double 
+                x = (Vector3.Dot(IntersectPoint - Position, Direction) % TextureDimensions.X) / TextureDimensions.X, 
+                y = (Vector3.Dot(IntersectPoint - Position, Up) % TextureDimensions.Y) / TextureDimensions.Y;
 
             if (x < 0) x += 1;
             if (y < 0) y += 1;
 
-            // inverts the y direction, can be removed but i thought it looked better this way
-            y = 1 - y;
-
-            // precentage to xoordinate
-            x *= Texture.GetLength(0) - 1;
-            y *= Texture.GetLength(1) - 1;
-
-
-            return Texture[(int)x, (int)y];
+            return Texture[(int)(x * (Texture.GetLength(0) - 1)), (int)((1 - y) * (Texture.GetLength(1) - 1))];
         }
     }
 }

@@ -4,10 +4,10 @@ namespace Raytracing
 {
     public class Camera
     {
-        Surface screen;
+        private Surface screen;
 
         public float distanceToPlane;
-        float aspectRatio;
+        private float aspectRatio;
         public float CurrentFOV;
 
         public Vector3 Position { get; set; }
@@ -15,9 +15,7 @@ namespace Raytracing
         public Vector3 Direction { get; set; }
         public Vector3 Right;
         public Vector3 PlaneCenter;
-        public Vector3 p0;
-        public Vector3 p1;
-        public Vector3 p2;
+        public Vector3 p0, p1, p2, p3;
         public Vector3 PlaneX;
         public Vector3 PlaneY;
         public Vector4 debugPlane;
@@ -49,6 +47,7 @@ namespace Raytracing
             p0 = PlaneCenter + Up - (aspectRatio * Right);
             p1 = PlaneCenter + Up + (aspectRatio * Right);
             p2 = PlaneCenter - Up - (aspectRatio * Right);
+            p3 = PlaneCenter - Up + (aspectRatio * Right);
             PlaneX = p1 - p0;
             PlaneY = p2 - p0;
             debugPlane = (p0.Z, p0.X, p1.Z, p1.X);
